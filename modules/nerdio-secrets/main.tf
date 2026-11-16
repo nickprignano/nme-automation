@@ -93,5 +93,5 @@ resource "azurerm_federated_identity_credential" "github" {
   user_assigned_identity_id = azurerm_user_assigned_identity.github[0].id
   issuer                    = "https://token.actions.githubusercontent.com"
   subject                   = "repo:${var.github_oidc.repository}:environment:${var.github_oidc.environment}"
-  audience                  = ["api://AzureADTokenExchange"]
+  audience                  = [var.cloud == "usgovernment" ? "api://AzureADTokenExchangeUSGov" : "api://AzureADTokenExchange"]
 }

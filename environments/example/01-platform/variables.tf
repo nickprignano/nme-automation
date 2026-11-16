@@ -218,7 +218,7 @@ variable "entra_app" {
       issuer      = string
       subject     = string
       description = optional(string, "Federated identity credential for Nerdio REST API client")
-      audiences   = optional(list(string), ["api://AzureADTokenExchange"])
+      audiences   = optional(list(string))
     })), {})
     rest_api_additional_principal_object_ids = optional(list(string), [])
   })

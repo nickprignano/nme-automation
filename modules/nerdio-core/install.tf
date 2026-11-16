@@ -14,6 +14,7 @@ resource "azapi_resource_action" "install" {
       parameters = {
         packageVersion = var.package_version
         maintenanceUri = var.maintenance_service_url
+        azureEnv       = local.cloud_endpoints.azure_type
       }
     }
   }

@@ -80,9 +80,19 @@ variable "rest_api_federated_credentials" {
     issuer      = string
     subject     = string
     description = optional(string, "Federated identity credential for Nerdio REST API client")
-    audiences   = optional(list(string), ["api://AzureADTokenExchange"])
+    audiences   = optional(list(string))
   }))
   default = {}
+}
+
+variable "cloud" {
+  description = "Azure cloud environment: public (AzureCloud) or usgovernment (AzureUSGovernment)."
+  type        = string
+  default     = "public"
+  validation {
+    condition     = contains(["public", "usgovernment"], var.cloud)
+    error_message = "cloud must be public or usgovernment."
+  }
 }
 
 variable "rest_api_additional_principal_object_ids" {

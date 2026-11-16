@@ -56,7 +56,6 @@ kit_config="$config_home/nme-automation"
 legacy_config="$config_home/nerdio-hcl"
 [[ ! -e "$kit_config" && -d "$legacy_config" ]] && kit_config="$legacy_config"
 env_name="${NME_ENV:-$(cat "$kit_config/current" 2>/dev/null || echo sandbox)}"
-location="${NME_LOCATION:-eastus2}"
 name="${NME_NAME:-nme-${env_name:0:3}}"
 
 say() { printf '\n== %s\n' "$*"; }
@@ -245,7 +244,10 @@ case "$(az cloud show --query name -o tsv 2>/dev/null)" in
   AzureUSGovernment) cloud="usgovernment" ;;
   *) cloud="public" ;;
 esac
-echo "Azure cloud: $cloud"
+default_location="eastus2"
+[ "$cloud" = usgovernment ] && default_location="usgovvirginia"
+location="${NME_LOCATION:-$default_location}"
+echo "Azure cloud: $cloud (location: $location)"
 jq -n \
   --arg tenant "$(az account show --query tenantId -o tsv)" \
   --arg sub "$(az account show --query id -o tsv)" \

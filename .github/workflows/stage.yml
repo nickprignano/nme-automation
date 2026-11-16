@@ -147,6 +147,8 @@ jobs:
         id: stage
         env:
           GH_TOKEN: ${{ github.token }}
+          NERDIO_CLOUD: ${{ vars.NERDIO_CLOUD || 'public' }}
+          ARM_ENVIRONMENT: ${{ vars.NERDIO_CLOUD || 'public' }}
         run: ./scripts/pipeline/stage.sh "$ACTION"
       # drift.yml: one small artifact per environment and stage, IDs already masked, for the job
       # that files the drift issue (it has no Azure access). A matrix of reusable-workflow calls
