@@ -1,5 +1,5 @@
 # The setup chatbot. Build from the repo root:  docker build -f assistant/Dockerfile .
-FROM python:3.13-slim
+FROM python:3.15-slim
 
 # Terraform checks rendered tfvars against the kit's variables (no providers or credentials needed).
 ARG TERRAFORM_VERSION=1.16.6
