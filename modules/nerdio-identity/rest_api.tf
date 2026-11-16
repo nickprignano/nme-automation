@@ -49,7 +49,7 @@ resource "azuread_application_federated_identity_credential" "rest_client" {
   application_id = azuread_application.rest_client[0].id
   display_name   = each.key
   description    = each.value.description
-  audiences      = each.value.audiences
+  audiences      = coalesce(each.value.audiences, [var.cloud == "usgovernment" ? "api://AzureADTokenExchangeUSGov" : "api://AzureADTokenExchange"])
   issuer         = each.value.issuer
   subject        = each.value.subject
 }

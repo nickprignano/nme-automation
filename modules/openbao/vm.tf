@@ -5,6 +5,19 @@ locals {
     }
   EOT
 
+  openbao_cloud = {
+    public = {
+      kv_suffix  = "vault.azure.net"
+      login_host = "login.microsoftonline.com"
+      azure_env  = "AzurePublicCloud"
+    }
+    usgovernment = {
+      kv_suffix  = "vault.usgovcloudapi.net"
+      login_host = "login.microsoftonline.us"
+      azure_env  = "AzureUSGovernment"
+    }
+  }[var.cloud]
+
   openbao_hcl = templatefile("${path.module}/templates/openbao.hcl.tftpl", {
     address               = local.address
     tenant_id             = local.tenant_id
@@ -20,6 +33,8 @@ locals {
     login_object_ids      = local.login_ids
     github_repository     = try(var.github_oidc.repository, null)
     github_environment    = try(var.github_oidc.environment, null)
+    login_host            = local.openbao_cloud.login_host
+    azure_env             = local.openbao_cloud.azure_env
   })
 
   cloud_init = templatefile("${path.module}/templates/cloud-init.yaml.tftpl", {
@@ -29,6 +44,7 @@ locals {
     tls_cert_name      = azurerm_key_vault_certificate.tls.name
     openbao_version    = var.openbao_version.version
     openbao_sha256     = var.openbao_version.sha256
+    kv_suffix          = local.openbao_cloud.kv_suffix
   })
 }
 

@@ -18,3 +18,4 @@ param enable_mail_send = entra.?enable_mail_send ?? false
 param create_rest_api_client = entra.?create_rest_api_client ?? true
 param rest_api_federated_credentials = entra.?rest_api_federated_credentials ?? {}
 param rest_api_additional_principal_object_ids = entra.?rest_api_additional_principal_object_ids ?? []
+param cloud = answers.?cloud ?? 'public'

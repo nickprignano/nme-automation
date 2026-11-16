@@ -29,6 +29,10 @@ param githubOidc { repository: string, environment: string? }?
 param publicNetworkAccess bool = true
 param purgeProtection bool = false
 
+@description('Azure cloud: public or usgovernment.')
+@allowed(['public', 'usgovernment'])
+param cloud string = 'public'
+
 // Built-in role definition IDs (public, the same in every tenant).
 var officerRole = 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'  // Key Vault Secrets Officer
 var userRole = '4633458b-17de-408a-b874-0445c86b69e6'  // Key Vault Secrets User
@@ -101,7 +105,7 @@ resource githubCredential 'Microsoft.ManagedIdentity/userAssignedIdentities/fede
   properties: {
     issuer: 'https://token.actions.githubusercontent.com'
     subject: 'repo:${githubOidc.?repository ?? ''}:environment:${githubEnvironment}'
-    audiences: ['api://AzureADTokenExchange']
+    audiences: [cloud == 'usgovernment' ? 'api://AzureADTokenExchangeUSGov' : 'api://AzureADTokenExchange']
   }
 }
 

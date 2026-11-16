@@ -19,9 +19,10 @@ listener "tcp" {
 
 # Managed identity through IMDS: no client ID or secret here.
 seal "azurekeyvault" {
-  tenant_id  = "${tenant_id}"
-  vault_name = "${key_vault_name}"
-  key_name   = "${unseal_key_name}"
+  tenant_id   = "${tenant_id}"
+  vault_name  = "${key_vault_name}"
+  key_name    = "${unseal_key_name}"
+  environment = "${azure_env}"
 }
 
 plugin_directory     = "/opt/openbao/plugins"
@@ -63,6 +64,7 @@ initialize "azure" {
     data = {
       tenant_id       = "${tenant_id}"
       subscription_id = "${subscription_id}"
+      environment     = "${azure_env}"
     }
   }
   request "role" {
@@ -87,8 +89,8 @@ initialize "entra" {
     operation = "update"
     path      = "auth/entra/config"
     data = {
-      jwks_url     = "https://login.microsoftonline.com/${tenant_id}/discovery/v2.0/keys"
-      bound_issuer = "https://login.microsoftonline.com/${tenant_id}/v2.0"
+      jwks_url     = "https://${login_host}/${tenant_id}/discovery/v2.0/keys"
+      bound_issuer = "https://${login_host}/${tenant_id}/v2.0"
     }
   }
   request "role" {

@@ -142,3 +142,17 @@ run "enterprise_ha_and_dr" {
     error_message = "Enterprise HA should enable Key Vault purge protection, staging slot, and App Service Plan autoscale."
   }
 }
+
+run "government_cloud_endpoints" {
+  command = plan
+
+  variables {
+    cloud    = "usgovernment"
+    location = "usgovvirginia"
+  }
+
+  assert {
+    condition     = azapi_resource_action.install.body.properties.parameters.azureEnv == "AzureUSGovernment" && azurerm_windows_web_app.this.app_settings["Deployment:AzureType"] == "AzureUSGovernment" && azurerm_windows_web_app.this.app_settings["AzureAd:Instance"] == "https://login.microsoftonline.us/"
+    error_message = "usgovernment should pass AzureUSGovernment to the install runbook and configure Government endpoints."
+  }
+}

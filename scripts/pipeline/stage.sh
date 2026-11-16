@@ -118,6 +118,7 @@ fail() {
 init_stage() { # $1 dir, $2 state name
   printf 'terraform {\n  backend "azurerm" {}\n}\n' > "$1/backend.tf"
   terraform -chdir="$1" init -input=false -no-color \
+    -backend-config="environment=${NERDIO_CLOUD:-public}" \
     -backend-config="resource_group_name=$TFSTATE_RESOURCE_GROUP" \
     -backend-config="storage_account_name=$TFSTATE_STORAGE_ACCOUNT" \
     -backend-config="container_name=tfstate" \
@@ -133,7 +134,11 @@ bicep_stack() {
   prefix="$(jq -r '.prefix // empty' "$platform/setup.auto.tfvars.json" 2>/dev/null || true)"
   echo "nerdio-${prefix:-nme}-platform"
 }
-bicep_location() { jq -r '.control_plane_location // .location // "eastus2"' "$platform/setup.auto.tfvars.json" 2>/dev/null || echo eastus2; }
+bicep_location() {
+  local def="eastus2"
+  [ "${NERDIO_CLOUD:-public}" = usgovernment ] && def="usgovvirginia"
+  jq -r --arg d "$def" '.control_plane_location // .location // $d' "$platform/setup.auto.tfvars.json" 2>/dev/null || echo "$def"
+}
 
 # What-if of the compiled template: the change list as [{action, address}], no-ops left out.
 bicep_whatif() { # $1 work dir holding main.json and main.parameters.json, $2 output file, $3 validation level
@@ -275,7 +280,9 @@ if [ "$action" = plan ]; then
     if [ ! -f "$stage_dir/zz-adopted.auto.tfvars.json" ] || [ -z "$(jq -r '.admin_group // empty' "$stage_dir/zz-adopted.auto.tfvars.json" 2>/dev/null)" ]; then
       if [ -f "$root/.nerdio/answers.json" ]; then
         fallback_group="$(jq -r '((.nerdio_admins // []) + (.admin_groups // [])) | map(select(test("^[0-9a-fA-F-]{36}$") | not)) | .[0] // empty' "$root/.nerdio/answers.json")"
-        fallback_loc="$(jq -r '.location // "eastus2"' "$root/.nerdio/answers.json")"
+        def_loc="eastus2"
+        [ "${NERDIO_CLOUD:-public}" = usgovernment ] && def_loc="usgovvirginia"
+        fallback_loc="$(jq -r --arg d "$def_loc" '.location // $d' "$root/.nerdio/answers.json")"
         if [ -n "$fallback_group" ]; then
           jq -n --arg g "$fallback_group" --arg l "$fallback_loc" '{admin_group: $g, location: $l}' > "$stage_dir/zz-adopted.auto.tfvars.json"
         fi

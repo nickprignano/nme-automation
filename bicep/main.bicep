@@ -271,6 +271,7 @@ module secrets 'modules/nerdio-secrets.bicep' = if (useKeyVault) {
     writerObjectId: deployer_object_id ?? deployer().objectId
     readerObjectIds: nme_secret.?reader_object_ids ?? []
     githubOidc: nme_secret.?github_oidc
+    cloud: cloud
   }
 }
 

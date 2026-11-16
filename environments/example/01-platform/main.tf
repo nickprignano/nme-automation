@@ -236,6 +236,7 @@ module "nerdio_identity" {
   rest_api_client_extra_owner_object_ids   = azurerm_user_assigned_identity.openbao[*].principal_id
   rest_api_federated_credentials           = var.entra_app.rest_api_federated_credentials
   rest_api_additional_principal_object_ids = var.entra_app.rest_api_additional_principal_object_ids
+  cloud                                    = var.cloud
 }
 
 # Hand-off of the Nerdio REST API client secret to stage 2 (decision 0015). Names are short and
@@ -262,6 +263,7 @@ module "nerdio_secrets" {
   reader_object_ids      = var.nme_secret.reader_object_ids
   github_oidc            = var.nme_secret.github_oidc
   deployer_object_id     = var.deployer_object_id
+  cloud                  = var.cloud
 }
 
 # Created here rather than in the module, because it must own the REST API client app before the

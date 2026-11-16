@@ -32,6 +32,10 @@ param grant_admin_consent bool = false
 param enable_mail_send bool = false
 param create_rest_api_client bool = true
 
+@description('Azure cloud: public or usgovernment.')
+@allowed(['public', 'usgovernment'])
+param cloud string = 'public'
+
 @description('Federated credentials on the REST API client app, keyed by name.')
 param rest_api_federated_credentials object = {}
 
@@ -156,7 +160,7 @@ resource restApp 'Microsoft.Graph/applications@v1.0' = if (create_rest_api_clien
       issuer: c.value.issuer
       subject: c.value.subject
       description: c.value.?description ?? 'Federated identity credential for Nerdio REST API client'
-      audiences: c.value.?audiences ?? ['api://AzureADTokenExchange']
+      audiences: c.value.?audiences ?? [cloud == 'usgovernment' ? 'api://AzureADTokenExchangeUSGov' : 'api://AzureADTokenExchange']
     }
   ]
 }

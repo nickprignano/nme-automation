@@ -115,3 +115,17 @@ run "plugin_must_be_pinned" {
 
   expect_failures = [var.azure_plugin_image]
 }
+
+run "government_cloud_endpoints" {
+  command = plan
+
+  variables {
+    cloud    = "usgovernment"
+    location = "usgovvirginia"
+  }
+
+  assert {
+    condition     = strcontains(local.openbao_hcl, "environment = \"AzureUSGovernment\"") && strcontains(local.openbao_hcl, "https://login.microsoftonline.us/") && strcontains(local.cloud_init, "vault.usgovcloudapi.net")
+    error_message = "usgovernment should render AzureUSGovernment and .us endpoints in OpenBao and cloud-init."
+  }
+}

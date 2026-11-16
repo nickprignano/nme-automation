@@ -18,11 +18,11 @@ write_files:
       # Copies OpenBao's TLS certificate and key from Key Vault (managed identity), and reloads
       # OpenBao when they change, so Key Vault's auto-renewal reaches the server.
       set -euo pipefail
-      imds="http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fvault.azure.net&client_id=${identity_client_id}"
+      imds="http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2F${kv_suffix}&client_id=${identity_client_id}"
       token="$(curl -fsS -H Metadata:true "$imds" | python3 -c 'import json,sys; print(json.load(sys.stdin)["access_token"])')"
       work="$(mktemp -d)"; trap 'rm -rf "$work"' EXIT
       curl -fsS -H "Authorization: Bearer $token" \
-        "https://${key_vault_name}.vault.azure.net/secrets/${tls_cert_name}?api-version=7.4" \
+        "https://${key_vault_name}.${kv_suffix}/secrets/${tls_cert_name}?api-version=7.4" \
         | python3 -c 'import json,sys; sys.stdout.write(json.load(sys.stdin)["value"])' > "$work/bundle.pem"
       openssl pkey -in "$work/bundle.pem" -out "$work/tls.key"
       openssl x509 -in "$work/bundle.pem" -out "$work/tls.crt"

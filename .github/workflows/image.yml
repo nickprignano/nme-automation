@@ -107,7 +107,8 @@ jobs:
           az storage blob download --auth-mode login --only-show-errors \
             --account-name "$TFSTATE_STORAGE_ACCOUNT" --container-name answers \
             --name "$NERDIO_ENV.json" --file .nerdio/answers.json >/dev/null
-          location="$(jq -r '.location // "eastus2"' .nerdio/answers.json)"
+          default_loc="${{ vars.NERDIO_CLOUD == 'usgovernment' && 'usgovvirginia' || 'eastus2' }}"
+          location="$(jq -r --arg d "$default_loc" '.location // $d' .nerdio/answers.json)"
           prefix="$(jq -r '.prefix // .name_prefix // "avd"' .nerdio/answers.json)"
           underscore="$(echo "$prefix" | tr '-' '_')"
           gallery_rg="$(jq -r --arg p "$prefix" '.image_gallery_resource_group // ("rg-" + $p + "-images")' .nerdio/answers.json)"
