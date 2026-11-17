@@ -23,7 +23,7 @@ resource "azurerm_resource_group" "arc" {
 
 # azurerm_virtual_desktop_host_pool does not yet expose the ARM identity block required by AVD Hybrid.
 resource "azapi_resource" "host_pool" {
-  type      = "Microsoft.DesktopVirtualization/hostPools@2024-04-03"
+  type      = "Microsoft.DesktopVirtualization/hostPools@2025-10-10"
   name      = local.pool_name
   location  = var.location
   parent_id = local.arc_rg_id
