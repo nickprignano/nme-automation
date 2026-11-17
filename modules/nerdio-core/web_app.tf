@@ -75,7 +75,7 @@ resource "azurerm_windows_web_app" "this" {
     always_on           = true
     http2_enabled       = true
     ftps_state          = "Disabled"
-    minimum_tls_version = "1.2"
+    minimum_tls_version = "1.3"
     use_32_bit_worker   = false
 
     application_stack {
@@ -111,7 +111,7 @@ resource "azurerm_windows_web_app_slot" "staging" {
     always_on           = true
     http2_enabled       = true
     ftps_state          = "Disabled"
-    minimum_tls_version = "1.2"
+    minimum_tls_version = "1.3"
     use_32_bit_worker   = false
 
     application_stack {

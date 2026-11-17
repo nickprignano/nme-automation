@@ -3,7 +3,7 @@ title: "Nerdio Manager platform"
 summary: "What the Marketplace deployment creates, the install step, setup wizard, roles and hardening"
 topic: nerdio
 status: verified
-last_reviewed: 2026-10-28
+last_reviewed: 2026-11-16
 ---
 
 # Nerdio Manager platform
@@ -72,6 +72,9 @@ How Nerdio Manager for Enterprise (NME) lands in Azure, and which parts can and 
 - SQL can be Entra-only with an Entra group as admin (web app identity plus the Nerdio app). The
   SQL server's identity needs Graph `User.Read.All`, `GroupMember.Read.All` and
   `Application.Read.All` to resolve group members.
+- Checked against `Get-Nerdio/NME-Terraform` (`modules/service/web_app.tf`, 2026-09-21): Nerdio's own
+  module sets `minimum_tls_version = "1.3"`, `.NET v10.0`, `NMW_OBJECT_TYPE = "PAAS"`,
+  `DataProtection:Storage:Type = "AzureBlob"`, and an optional `MaintenanceService:Uri`.
 
 ## Install step (manual, marketplace path)
 
