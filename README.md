@@ -105,6 +105,7 @@ modules/
   intune-policies/   optional Intune update rings and Defender exclusions via Microsoft Graph
   windows-365/       optional Windows 365 Cloud PC provisioning alongside Nerdio Manager
   azure-local/       optional Azure Local logical network and RBAC for hybrid AVD host pools
+  avd-hybrid/        optional AVD Hybrid landing zone (Arc RG, managed-identity host pool, RBAC) for Nutanix AHV / VMware vSphere / Hyper-V
   deploy-pipeline/   state storage, OIDC deploy identities and the GitHub approval gate
   assistant/         self-hosted setup chatbot (Container App, Entra sign-in, Claude / Foundry)
   github-settings/   repository settings, rulesets and labels declared in Terraform

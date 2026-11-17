@@ -389,6 +389,26 @@ module "azure_local" {
   tags                               = var.tags
 }
 
+module "avd_hybrid" {
+  source = "../../../modules/avd-hybrid"
+  count  = var.avd_hybrid != null ? 1 : 0
+
+  name_prefix                        = var.prefix
+  location                           = coalesce(var.avd_hybrid.location, var.control_plane_location)
+  hypervisor                         = var.avd_hybrid.hypervisor
+  arc_resource_group_name            = var.avd_hybrid.arc_resource_group_name
+  existing_arc_resource_group_id     = var.avd_hybrid.existing_arc_resource_group_id
+  host_pool_name                     = var.avd_hybrid.host_pool_name
+  host_pool_type                     = var.avd_hybrid.host_pool_type
+  load_balancer_type                 = var.avd_hybrid.load_balancer_type
+  maximum_sessions_allowed           = var.avd_hybrid.maximum_sessions_allowed
+  personal_desktop_assignment_type   = var.avd_hybrid.personal_desktop_assignment_type
+  custom_rdp_properties              = var.avd_hybrid.custom_rdp_properties
+  nerdio_service_principal_object_id = module.nerdio_identity[0].service_principal_object_id
+  onboarding_principal_id            = var.avd_hybrid.onboarding_principal_id
+  tags                               = var.tags
+}
+
 locals {
   w365_region_key = var.windows_365 != null ? coalesce(var.windows_365.region_key, local.control_plane_region_key) : local.control_plane_region_key
 }

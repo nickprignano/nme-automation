@@ -122,3 +122,8 @@ enable_hardening = false
 #   custom_location_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-contoso-azlocal/providers/Microsoft.ExtendedLocation/customLocations/cl-azlocal01"
 #   vm_switch_name     = "ConvergedSwitch(compute_management)"
 # }
+# avd_hybrid = {
+#   hypervisor              = "nutanix_ahv" # nutanix_ahv | vmware_vsphere | hyper_v | physical
+#   host_pool_type          = "Pooled"      # Pooled | Personal
+#   onboarding_principal_id = "22222222-2222-2222-2222-222222222222"
+# }

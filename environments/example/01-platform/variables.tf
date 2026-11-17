@@ -366,6 +366,24 @@ variable "azure_local" {
   default = null
 }
 
+variable "avd_hybrid" {
+  description = "Optional Azure Virtual Desktop Hybrid landing zone (Arc host resource group, managed-identity host pool, Reader/Arc RBAC, workspace and application group) for on-premises Nutanix AHV, VMware vSphere, Hyper-V or physical hosts (null skips)."
+  type = object({
+    location                         = optional(string)
+    hypervisor                       = optional(string, "nutanix_ahv")
+    arc_resource_group_name          = optional(string)
+    existing_arc_resource_group_id   = optional(string)
+    host_pool_name                   = optional(string)
+    host_pool_type                   = optional(string, "Pooled")
+    load_balancer_type               = optional(string, "BreadthFirst")
+    maximum_sessions_allowed         = optional(number, 10)
+    personal_desktop_assignment_type = optional(string, "Automatic")
+    custom_rdp_properties            = optional(string)
+    onboarding_principal_id          = optional(string)
+  })
+  default = null
+}
+
 variable "windows_365" {
   description = "Optional Windows 365 Enterprise Cloud PC Azure Network Connection, Provisioning Policy and User Settings alongside Nerdio Manager (null skips)."
   type = object({

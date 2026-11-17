@@ -341,6 +341,11 @@ run "enterprise_opt_in_modules_wire_up" {
       custom_location_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example-azlocal/providers/Microsoft.ExtendedLocation/customLocations/cl-01"
       vm_switch_name     = "ConvergedSwitch"
     }
+    avd_hybrid = {
+      hypervisor              = "nutanix_ahv"
+      host_pool_type          = "Pooled"
+      onboarding_principal_id = "22222222-2222-2222-2222-222222222222"
+    }
     regions = {
       eastus2 = {
         resource_groups = {
@@ -371,8 +376,8 @@ run "enterprise_opt_in_modules_wire_up" {
   }
 
   assert {
-    condition     = length(module.avd_insights) == 1 && length(module.cmk_encryption) == 1 && length(module.nerdio_rbac) == 1 && length(module.intune_policies) == 1 && length(module.windows_365) == 1 && length(module.azure_local) == 1 && length(module.vnet_runner) == 1
-    error_message = "All seven opt-in enterprise landing zone modules should instantiate when configured."
+    condition     = length(module.avd_insights) == 1 && length(module.cmk_encryption) == 1 && length(module.nerdio_rbac) == 1 && length(module.intune_policies) == 1 && length(module.windows_365) == 1 && length(module.azure_local) == 1 && length(module.avd_hybrid) == 1 && length(module.vnet_runner) == 1
+    error_message = "All eight opt-in enterprise landing zone modules should instantiate when configured."
   }
 
   assert {
