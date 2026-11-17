@@ -3,7 +3,7 @@ title: "Nerdio readiness checks"
 summary: "The read-only readiness engine behind ./nerdio preflight: stages, statuses, rights, and how it sits beside Nerdio's own readiness script"
 topic: nerdio
 status: verified
-last_reviewed: 2026-10-28
+last_reviewed: 2026-11-16
 sources:
   - https://nmehelp.getnerdio.com/hc/en-us/articles/44411071090317-Nerdio-Manager-Installation-Preparation-Steps
   - https://nmehelp.getnerdio.com/hc/en-us/articles/26124379482381-How-to-Check-the-Health-of-Nerdio-Manager
@@ -326,6 +326,11 @@ installation preparation article. Facts, from its README:
   integration and outbound reach, and deletes everything.
 - It needs **Owner** and **creates resources**, so in a strict tenant running it is itself a change.
 - It runs in PowerShell 7 with the Az modules (Cloud Shell's PowerShell mode works), interactively.
+- Its companion `NmeNetworkTest.ps1` (also invoked from Kudu) checks Commercial outbound reach to
+  `nwp-web-app.azurewebsites.net:443`, `login.microsoftonline.com:443`, `graph.microsoft.com:443`,
+  `login.windows.net:443`, `management.azure.com:443`, `api.github.com:443`,
+  `api.loganalytics.io:443`, `api.applicationinsights.io:443`, plus Key Vault (`:443`), SQL
+  Server (`:1433`), and DPS Storage (`:443`).
 - It has no license, so this kit uses it for facts only and never copies, wraps or re-hosts it.
 
 Use ours first (read-only, any time, in the pipeline) and Nerdio's when you need to know whether
