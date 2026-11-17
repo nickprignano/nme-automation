@@ -76,6 +76,20 @@
       "null_unless": {
         "nme_secret_store": "openbao"
       }
+    },
+    {
+      "stage": "platform",
+      "path": "azure_local",
+      "null_unless": {
+        "azure_local_enabled": true
+      }
+    },
+    {
+      "stage": "platform",
+      "path": "avd_hybrid",
+      "null_unless": {
+        "avd_hybrid_enabled": true
+      }
     }
   ],
   "constants": [
@@ -1493,6 +1507,312 @@
         {
           "stage": "config",
           "path": "fslogix_entra_kerberos"
+        }
+      ]
+    },
+    {
+      "id": "azure_local_enabled",
+      "phase": "configure",
+      "type": "bool",
+      "ask": "advanced",
+      "question": "Prepare an Azure Local (Azure Stack HCI) logical network and RBAC for hybrid AVD?",
+      "help": "Creates the Arc-enabled logical network and grants Nerdio Manager's service principal Azure Stack HCI VM Contributor on your Azure Local resource group. Linking the hybrid network and creating hybrid host pools still happens in the Nerdio Manager console.",
+      "default": false,
+      "kb": [
+        "modules/azure-local/README.md"
+      ]
+    },
+    {
+      "id": "azure_local_resource_group_id",
+      "phase": "configure",
+      "type": "string",
+      "when": {
+        "azure_local_enabled": [
+          true
+        ]
+      },
+      "pattern": "^/subscriptions/[^/]+/resourceGroups/[^/]+$",
+      "question": "Resource group ARM ID holding your Azure Local cluster resources?",
+      "help": "Full /subscriptions/.../resourceGroups/... ID where the logical network and RBAC assignment will be created.",
+      "default": "",
+      "tfvars": [
+        {
+          "stage": "platform",
+          "path": "azure_local.resource_group_id"
+        }
+      ]
+    },
+    {
+      "id": "azure_local_custom_location_id",
+      "phase": "configure",
+      "type": "string",
+      "when": {
+        "azure_local_enabled": [
+          true
+        ]
+      },
+      "pattern": "^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft\\.ExtendedLocation/customLocations/[^/]+$",
+      "question": "Azure Arc Custom Location ARM ID for the Azure Local cluster?",
+      "help": "Full /subscriptions/.../providers/Microsoft.ExtendedLocation/customLocations/... ID representing your Azure Local cluster.",
+      "default": "",
+      "tfvars": [
+        {
+          "stage": "platform",
+          "path": "azure_local.custom_location_id"
+        }
+      ]
+    },
+    {
+      "id": "azure_local_vm_switch_name",
+      "phase": "configure",
+      "type": "string",
+      "when": {
+        "azure_local_enabled": [
+          true
+        ]
+      },
+      "pattern": "^[A-Za-z0-9._() -]{1,128}$",
+      "question": "Hyper-V converged virtual switch name on the Azure Local cluster?",
+      "help": "For example, ConvergedSwitch(compute_management). Must match the switch configured on the cluster nodes.",
+      "default": "ConvergedSwitch(compute_management)",
+      "tfvars": [
+        {
+          "stage": "platform",
+          "path": "azure_local.vm_switch_name"
+        }
+      ]
+    },
+    {
+      "id": "azure_local_vlan_id",
+      "phase": "configure",
+      "type": "int",
+      "ask": "advanced",
+      "when": {
+        "azure_local_enabled": [
+          true
+        ]
+      },
+      "min": 0,
+      "max": 4094,
+      "question": "VLAN ID for AVD session host traffic on Azure Local (0 for untagged)?",
+      "help": "VLAN tag applied to the logical network subnet.",
+      "default": 0,
+      "tfvars": [
+        {
+          "stage": "platform",
+          "path": "azure_local.vlan_id"
+        }
+      ]
+    },
+    {
+      "id": "azure_local_address_prefix",
+      "phase": "configure",
+      "type": "string",
+      "ask": "advanced",
+      "when": {
+        "azure_local_enabled": [
+          true
+        ]
+      },
+      "pattern": "^$|^([0-9]{1,3}\\.){3}[0-9]{1,3}/[0-9]{1,2}$",
+      "question": "CIDR prefix for the Azure Local logical network (blank for DHCP)?",
+      "help": "Set an IPv4 CIDR like 10.60.10.0/24 for static IP allocation, or leave blank to use DHCP.",
+      "default": "",
+      "tfvars": [
+        {
+          "stage": "platform",
+          "path": "azure_local.address_prefix",
+          "omit_empty": true
+        }
+      ]
+    },
+    {
+      "id": "azure_local_default_gateway",
+      "phase": "configure",
+      "type": "string",
+      "ask": "advanced",
+      "when": {
+        "azure_local_enabled": [
+          true
+        ]
+      },
+      "pattern": "^$|^([0-9]{1,3}\\.){3}[0-9]{1,3}$",
+      "question": "Default gateway IP for static Azure Local IP allocation (blank for DHCP)?",
+      "help": "Next-hop IPv4 address for the 0.0.0.0/0 route when using static IP allocation.",
+      "default": "",
+      "tfvars": [
+        {
+          "stage": "platform",
+          "path": "azure_local.default_gateway",
+          "omit_empty": true
+        }
+      ]
+    },
+    {
+      "id": "azure_local_dns_servers",
+      "phase": "configure",
+      "type": "ipv4_list",
+      "ask": "advanced",
+      "when": {
+        "azure_local_enabled": [
+          true
+        ]
+      },
+      "question": "DNS server IPs for the Azure Local logical network (comma-separated, blank for none)?",
+      "help": "IPv4 addresses of DNS servers assigned to Azure Local session hosts.",
+      "default": [],
+      "tfvars": [
+        {
+          "stage": "platform",
+          "path": "azure_local.dns_servers",
+          "omit_empty": true
+        }
+      ]
+    },
+    {
+      "id": "avd_hybrid_enabled",
+      "phase": "configure",
+      "type": "bool",
+      "ask": "advanced",
+      "question": "Prepare an AVD Hybrid landing zone (Arc host RG, managed-identity host pool, RBAC) for on-premises session hosts?",
+      "help": "Creates the Azure resource group for Arc-enabled on-premises session hosts, a standard AVD host pool with a system-assigned managed identity, Reader and Arc RBAC, and a Desktop workspace/application group. Linking Nutanix Prism Central or VMware vCenter in Nerdio Manager still happens in the console.",
+      "default": false,
+      "kb": [
+        "docs/knowledge/nerdio/avd-hybrid.md",
+        "modules/avd-hybrid/README.md"
+      ]
+    },
+    {
+      "id": "avd_hybrid_hypervisor",
+      "phase": "configure",
+      "type": "enum",
+      "ask": "advanced",
+      "when": {
+        "avd_hybrid_enabled": [
+          true
+        ]
+      },
+      "question": "Which on-premises platform hosts the AVD Hybrid session hosts?",
+      "help": "Nerdio Manager 8.2+ documents AVD Hybrid provisioning on Nutanix AHV (Prism Central pc.7.3+ / AOS 7.3+ / AHV 10.3+) and lists VMware vSphere on its product page. Microsoft AVD Hybrid supports all four via the Azure Arc agent.",
+      "default": "nutanix_ahv",
+      "choices": [
+        {
+          "value": "nutanix_ahv",
+          "label": "Nutanix AHV (Prism Central)"
+        },
+        {
+          "value": "vmware_vsphere",
+          "label": "VMware vSphere (vCenter)"
+        },
+        {
+          "value": "hyper_v",
+          "label": "Microsoft Hyper-V (Arc guest agent)"
+        },
+        {
+          "value": "physical",
+          "label": "Physical Windows Server (Arc guest agent)"
+        }
+      ],
+      "tfvars": [
+        {
+          "stage": "platform",
+          "path": "avd_hybrid.hypervisor"
+        }
+      ]
+    },
+    {
+      "id": "avd_hybrid_host_pool_type",
+      "phase": "configure",
+      "type": "enum",
+      "ask": "advanced",
+      "when": {
+        "avd_hybrid_enabled": [
+          true
+        ]
+      },
+      "question": "Host pool type for AVD Hybrid?",
+      "help": "Pooled is typically used with Windows Server multi-user hosts; Personal is used with dedicated Windows 11 Enterprise single-session or physical hosts. Windows 11 multi-session is not supported on AVD Hybrid.",
+      "default": "Pooled",
+      "choices": [
+        {
+          "value": "Pooled",
+          "label": "Pooled"
+        },
+        {
+          "value": "Personal",
+          "label": "Personal"
+        }
+      ],
+      "tfvars": [
+        {
+          "stage": "platform",
+          "path": "avd_hybrid.host_pool_type"
+        }
+      ]
+    },
+    {
+      "id": "avd_hybrid_host_pool_name",
+      "phase": "configure",
+      "type": "string",
+      "ask": "advanced",
+      "when": {
+        "avd_hybrid_enabled": [
+          true
+        ]
+      },
+      "pattern": "^$|^[A-Za-z0-9][A-Za-z0-9._-]{1,63}$",
+      "question": "AVD Hybrid host pool name (blank for vdpool-<prefix>-hybrid)?",
+      "help": "Leave blank to use the standard naming convention.",
+      "default": "",
+      "tfvars": [
+        {
+          "stage": "platform",
+          "path": "avd_hybrid.host_pool_name",
+          "omit_empty": true
+        }
+      ]
+    },
+    {
+      "id": "avd_hybrid_arc_resource_group_name",
+      "phase": "configure",
+      "type": "string",
+      "ask": "advanced",
+      "when": {
+        "avd_hybrid_enabled": [
+          true
+        ]
+      },
+      "pattern": "^$|^[A-Za-z0-9._()-]{1,90}$",
+      "question": "Resource group name for Arc-enabled hybrid session hosts (blank for rg-<prefix>-avd-hybrid-arc)?",
+      "help": "Leave blank to create rg-<prefix>-avd-hybrid-arc.",
+      "default": "",
+      "tfvars": [
+        {
+          "stage": "platform",
+          "path": "avd_hybrid.arc_resource_group_name",
+          "omit_empty": true
+        }
+      ]
+    },
+    {
+      "id": "avd_hybrid_onboarding_principal_id",
+      "phase": "configure",
+      "type": "string",
+      "ask": "advanced",
+      "when": {
+        "avd_hybrid_enabled": [
+          true
+        ]
+      },
+      "pattern": "^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "question": "Entra object ID of the Arc onboarding service principal (optional, blank to skip)?",
+      "help": "If provided, grants Azure Connected Machine Onboarding on the Arc host resource group (used by Nerdio Manager's Nutanix AHV flow and scripted Arc onboarding).",
+      "default": "",
+      "tfvars": [
+        {
+          "stage": "platform",
+          "path": "avd_hybrid.onboarding_principal_id",
+          "omit_empty": true
         }
       ]
     }

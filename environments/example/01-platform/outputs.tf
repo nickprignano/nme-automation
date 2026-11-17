@@ -144,6 +144,19 @@ output "azure_local" {
   } : null
 }
 
+output "avd_hybrid" {
+  description = "AVD Hybrid Arc resource group, host pool, application group and workspace IDs when avd_hybrid is set, else null."
+  value = var.avd_hybrid != null ? {
+    arc_resource_group_id   = module.avd_hybrid[0].arc_resource_group_id
+    arc_resource_group_name = module.avd_hybrid[0].arc_resource_group_name
+    host_pool_id            = module.avd_hybrid[0].host_pool_id
+    host_pool_name          = module.avd_hybrid[0].host_pool_name
+    host_pool_principal_id  = module.avd_hybrid[0].host_pool_principal_id
+    application_group_id    = module.avd_hybrid[0].application_group_id
+    workspace_id            = module.avd_hybrid[0].workspace_id
+  } : null
+}
+
 output "windows_365" {
   description = "Windows 365 Cloud PC Azure Network Connection, Provisioning Policy and User Settings IDs when windows_365 is set, else null."
   value = var.windows_365 != null ? {
